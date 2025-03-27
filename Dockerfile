@@ -21,6 +21,13 @@ COPY . /code
 # Wait for the db to startup(via dockerize), then 
 # Build and run steve, requires a db to be available on port 3306
 CMD dockerize -wait tcp://$MYSQLHOST:$MYSQLPORT -timeout 60s && \
-	./mvnw clean package -Pdocker -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2" && \
-	java -XX:MaxRAMPercentage=85 -jar target/steve.jar
+    ./mvnw clean package -Pdocker -DskipTests -Dflyway.skip=true -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2" && \
+    java -XX:MaxRAMPercentage=85 \
+         -Ddb.ip=$MYSQLHOST \
+         -Ddb.port=$MYSQLPORT \
+         -Ddb.schema=$MYSQLDATABASE \
+         -Ddb.user=$MYSQLUSER \
+         -Ddb.password=$MYSQLPASSWORD \
+         -jar target/steve.jar
+
 
